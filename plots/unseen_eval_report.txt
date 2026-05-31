@@ -1,0 +1,39 @@
+══════════════════════════════════════════════════════════════════════
+  NEXUS SOC — Unseen Data Evaluation Report
+  Model: Hierarchical 10-Class (Optuna XGBoost)
+  Datasets: CIC-IDS2017 + CIC-IDS2018 + CIC-DDoS2019
+══════════════════════════════════════════════════════════════════════
+
+  Total unseen samples : 1,621,979
+  Rows skipped (train) : 250,000
+  Evaluation time      : 156.6s
+
+──────────────────────────────────────────────────────────────────────
+  Hierarchical 10-Class
+──────────────────────────────────────────────────────────────────────
+  Level 1 (groups)  Acc: 99.35%  F1: 99.36%
+
+  Accuracy=98.72%  Precision=98.75%  Recall=98.72%  F1(w)=98.70%  F1(m)=94.44%  AUC=99.31%  FAR=0.1782%
+
+  Inference: 1.81s (895980 flows/sec)
+
+                    precision    recall  f1-score   support
+
+            BENIGN     0.9999    0.9982    0.9991   1062946
+               Bot     0.9752    0.9999    0.9874     27335
+              DDoS     0.9970    0.9998    0.9984     72865
+DDoS Amplification     0.9779    0.9184    0.9473    100000
+   DDoS Volumetric     0.9592    0.9899    0.9743    200000
+     DoS GoldenEye     0.9893    0.9989    0.9941      5394
+          DoS Hulk     0.9982    0.9994    0.9988     77490
+          DoS Slow     0.8058    0.5942    0.6840     16115
+       FTP-Patator     0.7360    0.8995    0.8095     20309
+          PortScan     0.9918    0.9998    0.9958     20171
+       SSH-Patator     0.9993    0.9997    0.9995     19354
+
+          accuracy                         0.9872   1621979
+         macro avg     0.9482    0.9452    0.9444   1621979
+      weighted avg     0.9875    0.9872    0.9870   1621979
+
+
+══════════════════════════════════════════════════════════════════════

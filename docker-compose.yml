@@ -1,0 +1,87 @@
+version: "3.9"
+
+# ── HORUS SOC — Docker Compose ────────────────────────────────────────────────
+
+services:
+
+  # ── API ──────────────────────────────────────────────────────────────────────
+  horus-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-}
+    image: horus-soc:latest
+    container_name: horus-api
+    restart: unless-stopped
+    ports:
+      - "${HORUS_PORT:-8000}:8000"
+    environment:
+      HORUS_HOST:         "0.0.0.0"
+      HORUS_PORT:         "8000"
+      HORUS_API_KEY:      "${HORUS_API_KEY:-}"
+      HORUS_CORS_ORIGINS: "${HORUS_CORS_ORIGINS:-*}"
+    volumes:
+      - ./models:/app/models:ro
+      - horus-db:/app
+      - ./data:/app/data:ro
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  # ── nginx TLS proxy ─────────────────────────────────────────────────────────
+  horus-nginx:
+    image: nginx:1.27-alpine
+    container_name: horus-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+    depends_on:
+      horus-api:
+        condition: service_healthy
+    profiles:
+      - tls   # opt-in: docker compose --profile tls up
+
+  # ── Capture ─────────────────────────────────────────────────────────────────
+  horus-capture:
+    build:
+      context: ./capture
+      dockerfile: Dockerfile.capture
+    image: horus-capture:latest
+    container_name: horus-capture
+    restart: unless-stopped
+    network_mode: host          # required: nfstream needs direct NIC access
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
+    environment:
+      HORUS_API_URL:         "${HORUS_API_URL:-http://127.0.0.1:8000}"
+      HORUS_API_KEY:         "${HORUS_API_KEY:-}"
+      CAPTURE_IFACE:         "${CAPTURE_IFACE:-eth1}"
+      MGMT_IFACE:            "${MGMT_IFACE:-eth0}"
+      SYSLOG_SERVER:         "${SYSLOG_SERVER:-127.0.0.1}"
+      SYSLOG_PORT:           "${SYSLOG_PORT:-514}"
+      BATCH_SIZE:            "${BATCH_SIZE:-100}"
+      BATCH_TIMEOUT_S:       "${BATCH_TIMEOUT_S:-2.0}"
+      ALERT_MIN_SEVERITY:    "${ALERT_MIN_SEVERITY:-medium}"
+      LOG_LEVEL:             "${LOG_LEVEL:-INFO}"
+      PALOALTO_MGMT_IP:      "${PALOALTO_MGMT_IP:-}"
+      PALOALTO_API_KEY:      "${PALOALTO_API_KEY:-}"
+      PALOALTO_BLOCK_TAG:    "${PALOALTO_BLOCK_TAG:-IDS-AUTO-BLOCK}"
+    depends_on:
+      horus-api:
+        condition: service_healthy
+    profiles:
+      - capture   # opt-in: docker compose --profile capture up
+
+volumes:
+  horus-db:
+    driver: local

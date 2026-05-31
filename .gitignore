@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.venv/
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Environment
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+.pytest_cache/
+htmlcov/
+.coverage
+
+# Node
+horus-frontend/node_modules/
+horus-frontend/dist/
+horus-frontend/FRONTEND_DOCUMENTATION.md
+
+# SQLite
+*.db
+*.db-wal
+*.db-shm
+
+# Logs
+*.log
+*.pid
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Large files
+models/
+data
+data/
+docs/
+nginx/certs/
+requirements.lock
+horus-frontend/.vite/

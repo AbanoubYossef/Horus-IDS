@@ -1,0 +1,27 @@
+[Unit]
+Description=HORUS capture (RSPAN+NetFlow+Syslog+SNMP -> /predict/batch)
+After=network-online.target horus-api.service
+Wants=network-online.target horus-api.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/home/bogdan/Downloads/nexus-deploy-master/capture
+Environment=CAPTURE_IFACE=ens4
+Environment=MGMT_IFACE=ens3
+Environment=HORUS_API_URL=http://127.0.0.1:8000
+Environment=NETFLOW_PORT=2055
+Environment=SYSLOG_LISTEN_PORT=514
+Environment=SNMP_PORT=162
+Environment=BATCH_SIZE=50
+Environment=BATCH_TIMEOUT_S=2.0
+Environment=ALERT_MIN_SEVERITY=info
+Environment=LOG_LEVEL=INFO
+ExecStart=/home/bogdan/Downloads/nexus-deploy-master/.venv/bin/python /home/bogdan/Downloads/nexus-deploy-master/capture/flow_capture.py
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,19 @@
+[Unit]
+Description=HORUS SOC FastAPI (XGBoost IDS)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=bogdan
+Group=bogdan
+WorkingDirectory=/home/bogdan/Downloads/nexus-deploy-master
+EnvironmentFile=-/home/bogdan/Downloads/nexus-deploy-master/.env
+ExecStart=/home/bogdan/Downloads/nexus-deploy-master/.venv/bin/python -m uvicorn api:app --host 0.0.0.0 --port 8000
+Restart=on-failure
+RestartSec=3
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
